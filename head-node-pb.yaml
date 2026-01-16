@@ -1,0 +1,152 @@
+---
+#
+# This playbook prepares a host to be a head node for a private network cluster
+#
+- name: Head Node
+  hosts:
+    - pi5-5
+
+  become: true
+
+  tasks:
+    - name: Define uplink network
+      copy:
+        dest: /etc/netplan/10-enx3c64cfe8cf26.yaml
+        owner: root
+        group: root
+        mode: 0600
+        content: |
+          network:
+            version: 2
+            renderer: networkd
+            ethernets:
+              enx3c64cfe8cf26:
+                dhcp4: false
+                dhcp6: false
+                addresses:
+                  - 192.168.3.41/24
+                routes:
+                  - to: default
+                    via: 192.168.3.1
+                nameservers:
+                  addresses:
+                    - 192.168.3.31
+                    - 192.168.3.32
+                    - 192.168.3.1
+      tags: network
+      notify: Apply Netplan
+
+    - name: Define internal VLAN network
+      copy:
+        dest: /etc/netplan/20-eth0-bridge-vpns.yaml
+        owner: root
+        group: root
+        mode: 0600
+        content: |
+          network:
+            version: 2
+            renderer: networkd
+            ethernets:
+              eth0:
+                dhcp4: false
+                dhcp6: false
+
+            bridges:
+              br0:
+                interfaces:
+                  - eth0
+                dhcp4: false
+                dhcp6: false
+
+            vlans:
+              vlan16:
+                id: 16
+                link: br0
+                addresses:
+                  - 172.16.0.2/16
+              vlan17:
+                id: 17
+                link: br0
+                addresses:
+                  - 172.17.0.2/16
+      tags: network
+      notify: Apply Netplan
+
+    - name: Upgrade all packages
+      package:
+        name: "*"
+        state: latest
+        update_cache: true
+
+    - name: install base packages
+      package:
+        name:
+          - tmux
+          - minicom
+          - git
+          - nmap
+          - tcpdump
+          - traceroute
+          - ansible
+        state: present
+        update_cache: true
+        cache_valid_time: 86400
+
+    - name: Install DHCP service
+      block:
+        - name: Install ISC DHCP package
+          package:
+            name: isc-dhcp-server
+            state: present
+
+        - name: Install DHCP config (with known hosts entries)
+          # Need to fix that to be generated from a template
+          copy:
+            src: dhcpd.conf
+            dest: /etc/dhcp/dhcpd.conf
+
+        # for some reason this always reports fail even with daemon is running
+        - name: Enable DHCP service
+          service:
+            name: isc-dhcp-server
+            state: started
+            enabled: true
+          ignore_errors: true
+      tags: dhcpd
+
+    - name: Install DNS service
+      block:
+        - name: Install ISC Bind9 service
+          package:
+            name:
+              - bind9
+              - bind9-host
+              - dnsutils
+
+        - name: Install config file
+          copy:
+            src: named.conf
+            dest: /etc/bind/named.conf
+
+        - name: Create zone directory
+          file:
+            dest: /etc/bind/zones
+            state: directory
+
+        - name: Install zone files
+          copy:
+            src: "zones/{{ item }}.zone"
+            dest: "/etc/bind/zones/{{ item }}.zone"
+          loop: "{{ dns.zones }}"
+
+        - name: Enable and start named service
+          service:
+            name: named
+            state: started
+            enabled: yes
+
+  handlers:
+    - name: Apply Netplan
+      shell:
+        cmd: netplan apply
+

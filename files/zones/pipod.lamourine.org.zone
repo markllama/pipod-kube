@@ -1,0 +1,31 @@
+$ORIGIN pipod.lamourine.org.
+$TTL 3600
+
+@    3600	IN	SOA	ns.pipod.lamourine.org. markllama.gmail.com. (
+     2026010509 ; serial
+     7200	   ; refresh (2 hours)
+     1800	   ; retry (30 min)
+     604800	   ; expire (1 week)
+     3600	   ; minimum (1 hour)
+)
+
+@    3600	IN NS	ns
+@    3600	IN A	172.16.0.2
+@    3600	IN A	172.17.0.2
+
+ns1   IN		A  172.16.0.2
+ns2   IN		A  172.17.0.2
+
+gw   IN		A  172.16.0.1
+
+pi5-1		IN	A  172.16.0.11
+pi5-2		IN	A  172.16.0.12
+pi5-3		IN	A  172.16.0.13
+pi5-4		IN	A  172.16.0.14
+
+pi5-1.data	IN	A  172.17.0.11
+pi5-2.data	IN	A  172.17.0.12
+pi5-3.data	IN	A  172.17.0.13
+pi5-4.data	IN	A  172.17.0.14
+
+; glue records for subdomains

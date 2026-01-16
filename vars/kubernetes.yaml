@@ -1,0 +1,9 @@
+---
+kube:
+  version: v1.34
+
+crio:
+  version: v1.34
+
+calico:
+  version: v3.31.3

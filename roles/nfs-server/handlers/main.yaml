@@ -1,0 +1,4 @@
+---
+- name: Export NFS Shares
+  shell:
+    cmd: exportfs -a

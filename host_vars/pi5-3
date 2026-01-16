@@ -1,0 +1,36 @@
+---
+# eth0: 2c:cf:67:8b:32:ce
+# eth1: a0:ce:c8:fe:c3:7c
+# wlan0: 2c:cf:67:8b:32:d0
+#
+interfaces:
+  - conn_name: control
+    type: ethernet
+    ifname: eth0
+    mac: 2c:cf:67:8b:32:ce
+    ip4: 172.17.0.13/16
+    gw4: 172.17.0.1
+    dns4:
+      - 172.17.0.2
+      - 192.168.3.1
+      - 192.168.1.1
+    dns4_search: kube.lamourine.org
+    state: present
+    
+  - conn_name: data
+    type: ethernet
+    ifname: eth1
+    mac: a0:ce:c8:fe:c3:7c
+    ip4: 172.16.0.13/16
+    state: present
+
+# - conn_name: preconfigured
+#    type: wifi
+#    gw4_ignore_auto: true
+#    state: present
+
+  - conn_name: "Wired connection 1"
+    state: absent
+
+  - conn_name: "Wired connection 2"
+    state: absent

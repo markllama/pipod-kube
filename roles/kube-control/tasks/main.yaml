@@ -1,0 +1,106 @@
+- name: Install Kube Deployment Packages
+  package:
+    name:
+      - kubectl
+      - etcd-client
+    state: present
+  tags: packages
+
+- name: Install Utility Packages
+  package:
+    name:
+      - minicom
+      - tmux
+      - nmap
+      - traceroute
+      - tcpdump
+      - bind9-dnsutils
+      - git
+      - j2cli
+    state: present
+  tags: packages
+
+- name: Preserve kubernetes components
+  dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop: ['kubeadm', 'kubectl']
+  tags: packages
+  
+#- name: Add VLANs
+#  community.general.nmcli:
+#    type: vlan
+#    conn_name: "{{ item.conn_name }}"
+#    ifname: "{{ item.vlandev }}.{{item.vlanid}}"
+#    vlanid: "{{ item.vlanid }}"
+#    vlandev: "{{ item.vlandev }}"
+#    method4: manual
+#    ip4: "{{ item.ip4 }}"
+#    state: present
+#  loop: "{{ interfaces }}"
+#  when: "item.state == 'present' and item.type == 'vlan'"
+#  notify: Restart NetworkManager
+#  tags: network
+
+#- name: Set Gateway
+#  community.general.nmcli:
+#    conn_name: "{{ item.conn_name }}"
+#    gw4: "{{ item.gw4 }}"
+#    state: present
+#  loop: "{{ interfaces }}"
+#  when: "item.gw4 is defined"
+#  notify: Restart NetworkManager
+#  tags: network
+
+#- name: Unset Gateways
+#  community.general.nmcli:
+#    conn_name: "{{ item.conn_name }}"
+#    never_default4: true
+#    state: present
+#  loop: "{{ interfaces }}"
+#  when: "item.state == 'present' and item.gw4 is not defined"
+#  notify: Restart NetworkManager
+#  tags: network
+
+- name: Configure Helm repos and install helm
+  block:
+#    - name: Get repo arch
+#      cmd:
+        
+    - name: Get the Helm signing key
+      get_url:
+        url: "https://packages.buildkite.com/helm-linux/helm-debian/gpgkey"
+        dest: /etc/apt/trusted.gpg.d/helm.asc
+        mode: '0644'
+#        force: 
+      tags: helm
+
+    - name: Add the Helm apt repository
+      ansible.builtin.apt_repository:
+        # arch bloch needs dynamic discovery
+        repo: "deb [signed-by=/etc/apt/trusted.gpg.d/helm.asc] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main"
+        state: present
+        filename: helm
+        update_cache: yes
+      tags: helm
+
+    - name: Install Helm
+      package:
+        name: helm
+        state: present
+      tags: helm
+
+  tags: helm
+  
+- name: Install Calicoctl and Kube Plugin
+  uri:
+    url: "https://github.com/projectcalico/calico/releases/download/{{ calico.version }}/calicoctl-linux-arm64"
+    dest: "/usr/local/bin/{{ item }}"
+    creates: "/usr/local/bin/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  loop:
+    - calicoctl
+    - kubectl-calico
+  tags: calico

@@ -1,0 +1,9 @@
+---
+- name: Add Kubernetes Repo
+  yum_repository:
+    name: kubernetes
+    description: Kubernetes RPM Repository
+    baseurl: "https://pkgs.k8s.io/core:/stable:/{{ kube_version }}/rpm/"
+    gpgkey: https://pkgs.k8s.io/core:/stable:/v1.32/rpm/repodata/repomd.xml.key
+    gpgcheck: false
+    enabled: true

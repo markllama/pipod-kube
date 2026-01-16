@@ -1,0 +1,10 @@
+---
+
+- name: NFS Server
+  hosts:
+    - nfs_servers
+
+  become: true
+
+  roles:
+    - nfs-server

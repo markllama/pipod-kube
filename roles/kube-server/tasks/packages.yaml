@@ -1,0 +1,27 @@
+---
+- name: Prepare software repos
+  block:
+    - name: Import RPM repo tasks
+      import_tasks: rpm_repos.yaml
+      when: ansible_os_family == "RedHat"
+
+    - name: Import RPM repo tasks
+      import_tasks: apt_repos.yaml
+      when: ansible_os_family == "Debian"
+  tags: repos
+
+- name: Install Kube Server Packages
+  package:
+    name:
+      - kubeadm
+      - kubelet
+      - cri-o
+      - runc
+    state: present
+  tags: packages
+
+- name: Preserve kubernetes components
+  dpkg_selections:
+    name: kubelet
+    selection: hold
+  tags: packages

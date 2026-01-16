@@ -1,0 +1,44 @@
+---
+- name: install nfs server package
+  package:
+    name: nfs-kernel-server
+    state: present
+
+- name: enable and start NFS services
+  service:
+    name: nfs-server
+    state: started
+    enabled: true
+    
+- name: create export mount point
+  file:
+    path: /export
+    owner: nobody
+    group: nogroup
+    mode: 0755
+    state: directory
+
+- name: mount the device
+  mount:
+    path: "{{ item.path }}"
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+#    opts: "{{ item.options }}"
+    opts: "defaults"
+    boot: yes
+    passno: 1
+    state: present
+  loop: "{{ nfs.exports }}"
+  notify: Export NFS Shares
+  
+- name: Define the exports
+  lineinfile:
+    path: /etc/exports
+    line: "{{ item.path }} {{ item.hosts }}({{ item.options }})"
+    state: present
+    create: true
+    owner: root
+    group: root
+    mode: 0755
+  loop: "{{ nfs.exports }}"
+  notify: Export NFS Shares

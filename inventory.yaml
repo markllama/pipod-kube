@@ -1,0 +1,37 @@
+---
+pi5:
+  vars:
+    ansible_user: mark
+    ansible_ssh_private_key_file: ~/.ssh/infra-ansible-ed25519
+  hosts:
+    pi5-1:
+      ansible_host: 172.17.0.11
+    pi5-2:
+      ansible_host: 172.17.0.12
+    pi5-3:
+      ansible_host: 172.17.0.13
+    pi5-4:
+      ansible_host: 172.17.0.14
+    pi5-5:                        #aka pipod-head
+      #ansible_host: 192.168.3.41
+      ansible_connection: local
+
+kube_servers:
+  hosts:
+    pi5-5:
+
+kube_controllers:
+  hosts:
+    pi5-5:
+
+kube_workers:
+  hosts:
+    pi5-[1:4]:
+
+kube_dns_servers:
+  hosts:
+    pi5-5:
+
+nfs_servers:
+  hosts:
+    pi5-5:

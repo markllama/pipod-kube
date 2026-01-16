@@ -1,0 +1,45 @@
+---
+# install kube packages
+
+- name: Install apt-transport-https ca-certificates
+  ansible.builtin.apt:
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+
+- name: Download the Google Cloud public signing key
+  ansible.builtin.get_url:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Get the Kubernetes Apt Repo Key
+  get_url:
+    url: "https://pkgs.k8s.io/core:/stable:/{{ kube.version }}/deb/Release.key"
+    dest: /etc/apt/trusted.gpg.d/kubernetes-apt-keyring.asc
+    mode: '0644'
+    force: true
+
+- name: Add the Kubernetes apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/trusted.gpg.d/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/{{ kube.version }}/deb/ /"
+    state: present
+    filename: kubernetes
+    update_cache: yes
+
+- name: Get the CRI-O Apt Repo Key
+  get_url:
+    url: "https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio.version }}/deb/Release.key"
+    dest: /etc/apt/trusted.gpg.d/cri-o-apt-keyring.asc
+    mode: '0644'
+    force: true
+
+- name: Add the CRI-O apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/trusted.gpg.d/cri-o-apt-keyring.asc] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio.version }}/deb/ /"
+    state: present
+    filename: "cri-o"
+    update_cache: yes

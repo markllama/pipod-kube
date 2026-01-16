@@ -1,0 +1,63 @@
+---
+# eth0: 2c:cf:67:24:7e:a6
+# wlan0: 2c:cf:67:24:7e:a7
+#
+interfaces:
+#  - conn_name: preconfigured
+#    type: wifi
+#    ifname: wlan0
+#    ssid: llamanet
+#    mac: 2c:cf:67:24:7e:a7
+#    ip4: 192.168.2.198/24
+#    state: present
+
+# nmcli con add type vlan con-name eth0.17 dev eth0 id 17 ip4 172.17.0.2/16
+ 
+  - conn_name: data
+    type: vlan
+    vlanid: 16
+    vlandev: eth0
+    ip4: 172.16.0.2/16
+    state: present
+
+  - conn_name: control
+    type: vlan
+    vlanid: 17
+    vlandev: eth0
+    ip4: 172.17.0.2/16
+    #gw4: 172.17.0.1
+    state: present
+
+  - conn_name: lab
+    type: ethernet
+    ifname: eth1
+    ip4: 192.168.3.41/24
+    gw4: 192.168.3.1
+    dns4:
+      - 127.0.0.1
+      - 192.168.1.1
+      - 1.1.1.1
+    dns4_search: kube.lamourine.org
+    state: present
+
+  - conn_name: "Wired connection 1"
+    state: absent
+
+  - conn_name: "Wired connection 2"
+    state: absent
+
+dns:
+  zones:
+    - lab.lamourine.org
+    - kube.lamourine.org
+    - mgmt.kube.lamourine.org
+    - data.kube.lamourine.org
+
+nfs:
+  exports:
+    - path: "/export"
+      hosts: "172.16.0.0/16"
+      options: "rw,sync,no_subtree_check"
+      device: "/dev/sda1"
+      fstype: "ext4"
+      fsopts: "defaults,noatime 0 2"

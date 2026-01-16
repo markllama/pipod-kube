@@ -1,0 +1,18 @@
+---
+#
+# Prepare a system to act as a kube administration node
+#
+# Many tasks taken from:
+# https://medium.com/karlmax-berlin/how-to-install-kubernetes-on-raspberry-pi-53b4ce300b58
+#
+- name: Kubernetes Servers
+  hosts:
+    - kube_servers
+    - kube_workers
+  become: true
+
+  vars_files:
+    kubernetes.yaml
+
+  roles:
+    - kube-server
