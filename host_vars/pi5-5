@@ -46,6 +46,26 @@ interfaces:
   - conn_name: "Wired connection 2"
     state: absent
 
+netplan:
+  - name: eth0
+    type: ethernet
+    ipv4: 192.168.3.41/24
+    gw4: 192.168.3.1
+    nameservers:
+      - 192.168.3.2
+      - 192.168.3.3
+      - 192.168.3.1
+
+  - name: enx3c64cfe8cf26
+    type: ethernet
+    dhcp4: false
+    vlans:
+      - id: 20
+        ipv4: 172.20.0.0/24
+      - id: 21
+        ipv4: 172.21.0.0/24
+
+
 dns:
   zones:
     - lab.lamourine.org

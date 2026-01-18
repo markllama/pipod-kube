@@ -46,6 +46,20 @@
       notify: Restart NetworkManager
 
   when: network_manager.stat.exists
+
+# - name: Using Netplan
+#   block:
+#     - name: Disable Cloud-init network setup
+#       file:
+#         path: 50-cloud-init.yaml
+#         state: absent
+
+#     - name: Create Interface Files
+#       copy:
+        
+        
+
+    
 #
 # Kube Modules
 #
