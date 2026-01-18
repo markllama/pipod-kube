@@ -1,0 +1,20 @@
+---
+- name: Create Kubernetes Master
+  hosts:
+    - kube_controllers
+  become: true
+
+  vars:
+    kube:
+      pod_network: 172.18.0.0/16
+      api_address: 192.168.3.41
+      
+  vars_files:
+    - kubernetes.yaml
+
+  tasks:
+    - name: Testing
+      debug:
+        msg: Yep
+
+    - name: Check if kube services are active
