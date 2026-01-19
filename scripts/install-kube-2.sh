@@ -21,7 +21,7 @@ sudo apt -y install git tmux ansible
 sudo kubeadm init --config files/cluster-config.yaml --pod-network-cidr 172.18.0.0/24
 
 kubeadm token create --print-join-command
-kubeadm join 172.17.0.2:6443 --token a3eln2.sexw61l3t83c6svr --discovery-token-ca-cert-hash sha256:c8882f8b5356387bc00cb5d44f94006f0789d54a4c213e3b9565a81caef5ecf7
+kubeadm join 172.17.0.2:6443 --token xxxx --discovery-token-ca-cert-hash sha256:xxxxx
 
 
 kubectl get namespace "kube-flannel" -o json \
