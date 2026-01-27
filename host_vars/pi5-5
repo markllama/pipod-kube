@@ -67,11 +67,11 @@ netplan:
 
 
 dns:
-  zones:
-    - lab.lamourine.org
-    - kube.lamourine.org
-    - mgmt.kube.lamourine.org
-    - data.kube.lamourine.org
+  zones: []
+#    - lab.lamourine.org
+#    - kube.lamourine.org
+#    - mgmt.kube.lamourine.org
+#    - data.kube.lamourine.org
 
 nfs:
   exports:
