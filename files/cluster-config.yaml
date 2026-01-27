@@ -29,6 +29,7 @@ timeouts:
 apiServer:
   certSANs:
     - 192.168.3.41
+    - 172.17.0.2
     - pi5-5.lab.lamourine.org
     - pipod-head.lab.lamourine.org
 apiVersion: kubeadm.k8s.io/v1beta4
